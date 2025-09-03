@@ -1,6 +1,7 @@
 import type { EditUserFormData, PasswordFormData, RegisterFormData, UserRegistered } from "../types/user";
+import { PATH_BACKEND } from "./paths";
 
-const apiBackend = import.meta.env.VITE_PATH_BACKEND;
+const apiBackend = PATH_BACKEND;
 
 export async function getUsers(): Promise<UserRegistered[]> {
   const response = await fetch(`${apiBackend}/users`, {

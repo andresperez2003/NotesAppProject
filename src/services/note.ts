@@ -1,6 +1,7 @@
 import type { CreateNote, Note, NoteFormData } from "../types/note";
+import { PATH_BACKEND } from "./paths";
 
-const apiBackend = import.meta.env.VITE_PATH_BACKEND;
+const apiBackend = PATH_BACKEND;
 
 export async function createNote(note: CreateNote):Promise<void>{
     const response = await fetch(`${apiBackend}/notes`, {

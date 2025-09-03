@@ -1,0 +1,2 @@
+
+export const PATH_BACKEND="http://e0efc49b-4d7c-4219-aaae-9b935982d521.clouding.host"

@@ -1,7 +1,8 @@
 import type { Category, CategoryFormData } from '../types/category';
+import { PATH_BACKEND } from './paths';
 
 
-const apiBackend = import.meta.env.VITE_PATH_BACKEND;
+const apiBackend = PATH_BACKEND;
 
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch(`${apiBackend}/categories`, {
