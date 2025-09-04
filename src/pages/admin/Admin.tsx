@@ -5,8 +5,6 @@ import {
   Search, 
 
   Mail,
-
-  Shield,
   ChevronLeft,
   ChevronRight,
 
@@ -14,7 +12,6 @@ import {
 import '../../styles/Admin.css';
 import { getUsers } from '../../services/users';
 import type { UserRegistered } from '../../types/user';
-import type { Rol } from '../../types/rol';
 
 
 const Admin: React.FC = () => {
@@ -54,9 +51,7 @@ const Admin: React.FC = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
-  const getRoleText = (role: Rol) => {
-    return role.name === 'admin' ? 'Administrador' : 'Usuario';
-  };
+
 
   const getInitials = (name: string) => {
     return name
