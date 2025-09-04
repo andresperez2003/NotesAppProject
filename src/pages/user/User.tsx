@@ -4,9 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  User as UserIcon, 
-  Mail, 
+import {
   Shield, 
  
   Lock, 

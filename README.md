@@ -44,25 +44,8 @@ npm install
 ```bash
 npm run dev
 ```
-
-4. **Abrir en el navegador**
-```
-http://localhost:5173
 ```
 
-## 👤 Usuarios de Prueba
-
-### 🔑 Credenciales Disponibles
-
-#### **Administrador**
-- **Email:** `admin@example.com`
-- **Contraseña:** `Admin2024!`
-- **Acceso:** Panel de usuarios
-
-#### **Usuario Normal**
-- **Email:** `user@example.com`
-- **Contraseña:** `User2024!`
-- **Acceso:** Notas y categorías
 
 ## 🗂️ Estructura del Proyecto
 
