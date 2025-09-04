@@ -28,12 +28,11 @@
   box-sizing: border-box;
 }
 
-/* Container */
 .category-container {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
+  min-height: 100vh;
+  padding-top: 1rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Header */
