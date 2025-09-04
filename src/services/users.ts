@@ -1,5 +1,5 @@
 import type { LoginResponse } from "../types/auth";
-import type { EditUserFormData, PasswordFormData, RegisterFormData, UserRegistered } from "../types/user";
+import type { PasswordFormData, RegisterFormData, UserRegistered } from "../types/user";
 import { PATH_BACKEND } from "./paths";
 
 const apiBackend = PATH_BACKEND;
@@ -84,10 +84,7 @@ export async function loginUser(email: string, password: string): Promise<LoginR
     const result: LoginResponse = await response.json();
     console.log(result);
     localStorage.setItem('token', result.token);
-    const user: UserRegistered = {
-      ...result.user,
-      role: result.user.role
-    };
+
     return result;
   } else {
     throw new Error('Error al iniciar sesión');

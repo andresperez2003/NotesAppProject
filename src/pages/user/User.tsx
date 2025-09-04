@@ -19,7 +19,7 @@ import {
 
 } from 'lucide-react';
 import '../../styles/User.css';
-import type { EditUserFormData, PasswordFormData, UserRegistered } from '../../types/user';
+import type { PasswordFormData, UserRegistered } from '../../types/user';
 import { changePassword, getCurrentUser } from '../../services/users';
 import Swal from 'sweetalert2';
 
@@ -39,17 +39,7 @@ const passwordSchema = yup.object({
     .required('Confirma tu nueva contraseña'),
 }).required();
 
-const editUserSchema = yup.object({
-  name: yup
-    .string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(80, 'El nombre no puede tener más de 80 caracteres')
-    .required('El nombre es requerido'),
-  email: yup
-    .string()
-    .email('Debe ser un correo electrónico válido')
-    .required('El correo electrónico es requerido'),
-}).required();
+
 
 const User: React.FC = () => {
   const [user, setUser] = useState<UserRegistered | null>(null);
@@ -58,7 +48,7 @@ const User: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -72,15 +62,7 @@ const User: React.FC = () => {
     resolver: yupResolver(passwordSchema),
   });
 
-  const {
-    register: registerEdit,
-    handleSubmit: handleSubmitEdit,
-    formState: { errors: editErrors },
-    reset: resetEdit,
-    setValue: setEditValue,
-  } = useForm<EditUserFormData>({
-    resolver: yupResolver(editUserSchema),
-  });
+
 
   // Obtener datos del usuario actual
   useEffect(() => {
@@ -126,36 +108,9 @@ const User: React.FC = () => {
     }
   };
 
-  const onSubmitEdit = async (data: EditUserFormData) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
 
-    try {
-      // Simular actualización de usuario
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (user) {
-        const updatedUser = {
-          ...user,
-          name: data.name,
-          email: data.email
-        };
-        setUser(updatedUser);
-      }
-      
-      setSuccess('Información actualizada exitosamente');
-      resetEdit();
-      setShowEditModal(false);
-      
-      // Limpiar mensaje de éxito después de 3 segundos
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Error al actualizar la información');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+
 
   const handleClosePasswordModal = () => {
     setShowPasswordModal(false);
@@ -163,19 +118,9 @@ const User: React.FC = () => {
     setError('');
   };
 
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-    resetEdit();
-    setError('');
-  };
 
-  const handleOpenEditModal = () => {
-    if (user) {
-      setEditValue('name', user.name);
-      setEditValue('email', user.email);
-    }
-    setShowEditModal(true);
-  };
+
+
 
   const getRoleText = (role: { id: number; name: string }) => {
     return role.name === 'admin' ? 'Administrador' : 'Usuario';
@@ -328,16 +273,7 @@ const User: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-{/*           <motion.button
-            className="edit-profile-btn"
-            onClick={handleOpenEditModal}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Edit3 className="btn-icon" />
-            <span>Editar Perfil</span>
-          </motion.button> */}
+
           
           <motion.button
             className="change-password-btn"
@@ -351,128 +287,6 @@ const User: React.FC = () => {
           </motion.button>
         </motion.div>
       </motion.div>
-
-      {/* Modal para editar perfil */}
-      <AnimatePresence>
-        {showEditModal && (
-          <motion.div 
-            className="modal-overlay" 
-            onClick={handleCloseEditModal}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div 
-              className="modal-content" 
-              onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="modal-header">
-                <div className="modal-title-section">
-                  <UserIcon className="modal-title-icon" />
-                  <h2 className="modal-title">Editar Perfil</h2>
-                </div>
-                <motion.button 
-                  className="close-btn" 
-                  onClick={handleCloseEditModal}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <X />
-                </motion.button>
-              </div>
-
-              <form onSubmit={handleSubmitEdit(onSubmitEdit)} className="modal-form">
-                <div className="input-group">
-                  <label htmlFor="editName" className="input-label">
-                    <UserIcon className="input-icon" />
-                    Nombre Completo
-                  </label>
-                  <input
-                    id="editName"
-                    type="text"
-                    {...registerEdit('name')}
-                    className={`modal-input ${editErrors.name ? 'error' : ''}`}
-                    placeholder="Ingresa tu nombre completo"
-                    maxLength={80}
-                  />
-                  {editErrors.name && (
-                    <motion.span 
-                      className="error-message"
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {editErrors.name.message}
-                    </motion.span>
-                  )}
-                </div>
-
-                <div className="input-group">
-                  <label htmlFor="editEmail" className="input-label">
-                    <Mail className="input-icon" />
-                    Correo Electrónico
-                  </label>
-                  <input
-                    id="editEmail"
-                    type="email"
-                    {...registerEdit('email')}
-                    className={`modal-input ${editErrors.email ? 'error' : ''}`}
-                    placeholder="Ingresa tu correo electrónico"
-                  />
-                  {editErrors.email && (
-                    <motion.span 
-                      className="error-message"
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {editErrors.email.message}
-                    </motion.span>
-                  )}
-                </div>
-
-                <div className="modal-actions">
-                  <motion.button
-                    type="submit"
-                    disabled={isLoading}
-                    className="submit-btn"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {isLoading ? (
-                      <motion.div 
-                        className="loading-spinner-small"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                    ) : (
-                      <CheckCircle className="btn-icon" />
-                    )}
-                    {isLoading ? 'Actualizando...' : 'Actualizar Perfil'}
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    onClick={handleCloseEditModal}
-                    className="cancel-btn"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    Cancelar
-                  </motion.button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Modal para cambiar contraseña */}
       <AnimatePresence>

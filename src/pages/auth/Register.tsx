@@ -49,7 +49,7 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
+
   } = useForm<RegisterFormData>({
     resolver: yupResolver(registerSchema),
   });
