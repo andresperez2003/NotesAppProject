@@ -646,6 +646,13 @@
     flex-direction: column;
     text-align: center;
     gap: 1.5rem;
+    align-items: center;
+  }
+  
+  .profile-info {
+    align-items: center;
+    text-align: center;
+    width: 100%;
   }
   
   .profile-details {
