@@ -5,7 +5,8 @@ html, body {
 }
 
 .login-container {
-  height: 100vh;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   width: 100vw;
   display: flex;
   flex-direction: column;
