@@ -17,6 +17,7 @@ import type { UserRegistered } from '../../types/user';
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<UserRegistered[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState<boolean>(true);
+  const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth <= 640 : false);
 
   const [filterName, setFilterName] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'user'>('all');
@@ -37,6 +38,12 @@ const Admin: React.FC = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   // Filtrar usuarios
   const filteredUsers = users.filter(user => {
     const matchesName = user.name.toLowerCase().includes(filterName.toLowerCase()) ||
@@ -51,8 +58,6 @@ const Admin: React.FC = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
-
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -60,6 +65,11 @@ const Admin: React.FC = () => {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const truncateForMobile = (text: string, max: number) => {
+    if (!isMobile) return text;
+    return text.length > max ? `${text.slice(0, max)}...` : text;
   };
 
   return (
@@ -185,18 +195,20 @@ const Admin: React.FC = () => {
                     whileHover={{ y: -2, boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}
                   >
                     <div className="user-info">
-                      <div className="user-avatar">
-                        <div className="avatar-content">
-                          <span className="avatar-initials">{getInitials(user.name)}</span>
+                      {!isMobile && (
+                        <div className="user-avatar">
+                          <div className="avatar-content">
+                            <span className="avatar-initials">{getInitials(user.name)}</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <div className="user-details">
                         <div className="user-name" title={user.name}>
                           {user.name}
                         </div>
                         <div className="user-email" title={user.email}>
                           <Mail className="meta-icon" />
-                          {user.email}
+                          {truncateForMobile(user.email, 25)}
                         </div>
                       </div>
                     </div>
