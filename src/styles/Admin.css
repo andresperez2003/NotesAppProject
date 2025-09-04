@@ -57,6 +57,31 @@
   letter-spacing: -0.025em;
 }
 
+/* Legend */
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend-dot.admin {
+  background: #29ac27;
+}
+.legend-dot.user {
+  background: #2563EB;
+}
+.legend-separator {
+  opacity: 0.5;
+  margin: 0 0.25rem;
+}
+
 /* Content */
 .admin-content {
   max-width: 1200px;
@@ -158,6 +183,14 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Color por rol */
+.user-item.role-admin {
+  border-left: 6px solid #29ac27;
+}
+.user-item.role-user {
+  border-left: 6px solid #2563EB;
+}
+
 .user-item:hover {
   border-color: var(--border-color);
   box-shadow: var(--shadow-md);
@@ -193,25 +226,6 @@
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.025em;
-}
-
-.status-dot {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: var(--shadow-sm);
-}
-
-.status-dot.active {
-  background: var(--success-color);
-}
-
-.status-dot.inactive {
-  background: var(--text-light);
 }
 
 .user-details {
@@ -437,34 +451,26 @@
   .admin-container {
     padding: 1rem;
   }
-  
   .admin-title {
     font-size: 2rem;
   }
-  
   .search-filter-container {
     flex-direction: column;
     align-items: stretch;
   }
-  
   .search-container,
   .filter-container {
     min-width: auto;
   }
-  
   .user-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .user-actions {
-    align-self: flex-end;
-  }
-  
-  .user-meta {
-    flex-direction: column;
     gap: 0.5rem;
+  }
+  .user-details {
+    gap: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
@@ -472,22 +478,17 @@
   .admin-title {
     font-size: 1.75rem;
   }
-  
-  .user-name {
-    font-size: 1.125rem;
-  }
-  
   .avatar-content {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
-  
   .avatar-initials {
+    font-size: 0.95rem;
+  }
+  .user-name {
     font-size: 1rem;
   }
-  
-  .action-btn {
-    width: 36px;
-    height: 36px;
+  .user-email {
+    font-size: 0.85rem;
   }
 }

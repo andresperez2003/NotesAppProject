@@ -44,14 +44,12 @@
   }
   
   .main-content {
-    padding: 1rem;
-    padding-top: 5rem; /* Espacio para el botón de menú móvil */
+    padding: 1rem; /* Espacio para el botón de menú móvil */
   }
 }
 
 @media (max-width: 480px) {
   .main-content {
     padding: 0.5rem;
-    padding-top: 4rem;
   }
 }

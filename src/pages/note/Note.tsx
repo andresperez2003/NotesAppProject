@@ -22,6 +22,7 @@ import {
   FolderOpen,
 
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/Note.css';
 import { createNote, deleteNote, getNotes, updateNote } from '../../services/note';
 import type { CategoryNote } from '../../types/category';
@@ -64,6 +65,7 @@ const NoteComponent: React.FC = () => {
   const itemsPerPage = 3;
   const [notes, setNotes] = useState<Note[]>([]);
   const [categories, setCategories] = useState<CategoryNote[]>([]);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -217,6 +219,11 @@ const NoteComponent: React.FC = () => {
     setEditingNote(null);
     reset();
     setShowModal(true);
+  };
+
+  const handleGoToCreateCategory = () => {
+    setShowModal(false);
+    navigate('/dashboard/categories', { state: { openCreate: true } });
   };
 
   return (
@@ -568,18 +575,30 @@ const NoteComponent: React.FC = () => {
                     <FolderOpen className="input-icon" />
                     Categoría
                   </label>
-                  <select
-                    id="noteCategory"
-                    {...register('category_id')}
-                    className={`modal-select ${errors.category_id ? 'error' : ''}`}
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categories.map(category => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <select
+                      id="noteCategory"
+                      {...register('category_id')}
+                      className={`modal-select ${errors.category_id ? 'error' : ''}`}
+                    >
+                      <option value="">Selecciona una categoría</option>
+                      {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    <motion.button
+                      type="button"
+                      onClick={handleGoToCreateCategory}
+                      className="create-btn"
+                      title="Crear categoría"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Plus className="btn-icon" />
+                    </motion.button>
+                  </div>
                   {errors.category_id && (
                     <motion.span 
                       className="error-message"

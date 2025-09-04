@@ -17,6 +17,7 @@ import {
   ChevronRight,
 
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import '../../styles/Category.css';
 import type { Category, CategoryFormData } from '../../types/category';
 import { createCategory, deleteCategory, getCategories, updateCategory } from '../../services/category';
@@ -44,6 +45,7 @@ const CategoryComponent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   const [categories, setCategories] = useState<Category[]>([]);
+  const location = useLocation();
 
   const {
     register,
@@ -63,6 +65,17 @@ const CategoryComponent: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  // Si nos navegan con state.openCreate, abrir el modal automáticamente
+  useEffect(() => {
+    if ((location.state as { openCreate?: boolean } | null)?.openCreate) {
+      setEditingCategory(null);
+      reset();
+      setShowModal(true);
+      // limpiar el estado para evitar re-aperturas al navegar atrás
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, reset]);
 
 
   // Filtrar categorías

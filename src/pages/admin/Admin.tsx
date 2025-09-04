@@ -6,7 +6,6 @@ import {
 
   Mail,
 
-  Shield,
   ChevronLeft,
   ChevronRight,
 
@@ -14,7 +13,6 @@ import {
 import '../../styles/Admin.css';
 import { getUsers } from '../../services/users';
 import type { UserRegistered } from '../../types/user';
-import type { Rol } from '../../types/rol';
 
 
 const Admin: React.FC = () => {
@@ -48,10 +46,6 @@ const Admin: React.FC = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
-  const getRoleText = (role: Rol) => {
-    return role.name === 'admin' ? 'Administrador' : 'Usuario';
-  };
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -76,6 +70,13 @@ const Admin: React.FC = () => {
       >
         <div className="header-content">
           <h1 className="admin-title">Usuarios Registrados</h1>
+          <div className="legend">
+            <span className="legend-dot admin"></span>
+            <span className="legend-text">Verde: Administrador</span>
+            <span className="legend-separator">•</span>
+            <span className="legend-dot user"></span>
+            <span className="legend-text">Azul: Usuario</span>
+          </div>
         </div>
       </motion.div>
 
@@ -146,7 +147,7 @@ const Admin: React.FC = () => {
               {currentUsers.map((user, index) => (
                 <motion.div
                   key={user.id}
-                  className="user-item"
+                  className={`user-item role-${user.role.name}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -166,10 +167,6 @@ const Admin: React.FC = () => {
                         <Mail className="meta-icon" />
                         {user.email}
                       </div>
-                      <span className={`role-badge ${user.role.name}`} title={getRoleText(user.role)}>
-                        <Shield className="meta-icon" />
-                        {getRoleText(user.role)}
-                      </span>
                     </div>
                   </div>
                 </motion.div>
