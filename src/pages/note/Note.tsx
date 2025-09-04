@@ -16,7 +16,6 @@ import {
   Eye,
   X, 
   CheckCircle,
-  AlertCircle,
   ChevronLeft,
   ChevronRight,
   FolderOpen,
@@ -57,6 +56,7 @@ const NoteComponent: React.FC = () => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [filterName, setFilterName] = useState('');
@@ -81,6 +81,7 @@ const NoteComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoadingData(true);
       try {
         const notesData = await getNotes();
         const categoriesData = await getCategories();
@@ -89,6 +90,8 @@ const NoteComponent: React.FC = () => {
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setIsLoadingData(false);
       }
     };
     
@@ -244,7 +247,27 @@ const NoteComponent: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Spinner de loading */}
+      {/* Spinner de loading inicial de datos */}
+      <AnimatePresence>
+        {isLoadingData && (
+          <motion.div 
+            className="loading-spinner-container"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="loading-spinner"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <span className="loading-text">Cargando notas...</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Spinner de loading para acciones */}
       <AnimatePresence>
         {isLoading && (
           <motion.div 
@@ -268,219 +291,193 @@ const NoteComponent: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {error && (
-          <motion.div 
-            className="error-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AlertCircle className="error-icon" />
-            <p className="error-text">{error}</p>
-          </motion.div>
-        )}
-
-        {success && (
-          <motion.div 
-            className="success-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CheckCircle className="success-icon" />
-            <p className="success-text">{success}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div 
-        className="note-content"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        {/* Filtros y controles */}
-        <div className="controls-section">
-          <div className="search-filter-container">
-            <div className="search-container">
-              <Search className="search-icon" />
-              <input
-                type="text"
-                placeholder="Buscar notas..."
-                value={filterName}
-                onChange={(e) => setFilterName(e.target.value)}
-                className="search-input"
-              />
-            </div>
-            <div className="filter-container">
-              
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value === '' ? '' : Number(e.target.value))}
-                className="filter-select"
+      {!isLoadingData && (
+        <motion.div 
+          className="note-content"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          {/* Filtros y controles */}
+          <div className="controls-section">
+            <div className="search-filter-container">
+              <div className="search-container">
+                <Search className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Buscar notas..."
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              <div className="filter-container">
+                
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="filter-select"
+                >
+                  <option value="">Todas las categorías</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <motion.button
+                className="create-btn"
+                onClick={handleCreateNew}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
               >
-                <option value="">Todas las categorías</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+                <Plus className="btn-icon" />
+                <span>Nueva Nota</span>
+              </motion.button>
             </div>
-            <motion.button
-              className="create-btn"
-              onClick={handleCreateNew}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Plus className="btn-icon" />
-              <span>Nueva Nota</span>
-            </motion.button>
           </div>
-        </div>
 
-        {/* Lista de notas */}
-        <div className="notes-list">
-          {currentNotes.length === 0 ? (
-            <motion.div 
-              className="empty-state"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FileText className="empty-icon" />
-              <h3 className="empty-title">No hay notas</h3>
-              <p className="empty-description">
-                {filterName || filterCategory ? 'No se encontraron notas con esos filtros' : 'Crea tu primera nota para organizar tus ideas'}
-              </p>
-              {!filterName && !filterCategory && (
-                <motion.button
-                  className="create-btn-secondary"
-                  onClick={handleCreateNew}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Plus className="btn-icon" />
-                  <span>Crear Nota</span>
-                </motion.button>
-              )}
-            </motion.div>
-          ) : (
-            <>
-              {currentNotes.map((note, index) => (
-                <motion.div
-                  key={note.id}
-                  className="note-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileHover={{ y: -2, boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}
-                >
-                  <div className="note-info">
-                    <div className="note-icon">
-                      <FileText />
-                    </div>
-                    <div className="note-details">
-                      <h3 className="note-name">{note.name}</h3>
-                      <p className="note-description">
-                        {note.description.length > 100 
-                          ? `${note.description.substring(0, 100)}...` 
-                          : note.description
-                        }
-                      </p>
-                      <div className="note-meta">
-                        <span className="note-category">
-                          <FolderOpen className="meta-icon" />
-                          {note.category.name}
-                        </span>
-                        
+          {/* Lista de notas */}
+          <div className="notes-list">
+            {currentNotes.length === 0 ? (
+              <motion.div 
+                className="empty-state"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <FileText className="empty-icon" />
+                <h3 className="empty-title">No hay notas</h3>
+                <p className="empty-description">
+                  {filterName || filterCategory ? 'No se encontraron notas con esos filtros' : 'Crea tu primera nota para organizar tus ideas'}
+                </p>
+                {!filterName && !filterCategory && (
+                  <motion.button
+                    className="create-btn-secondary"
+                    onClick={handleCreateNew}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Plus className="btn-icon" />
+                    <span>Crear Nota</span>
+                  </motion.button>
+                )}
+              </motion.div>
+            ) : (
+              <>
+                {currentNotes.map((note, index) => (
+                  <motion.div
+                    key={note.id}
+                    className="note-item"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    whileHover={{ y: -2, boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}
+                  >
+                    <div className="note-info">
+                      <div className="note-icon">
+                        <FileText />
+                      </div>
+                      <div className="note-details">
+                        <h3 className="note-name">{note.name}</h3>
+                        <p className="note-description">
+                          {note.description.length > 100 
+                            ? `${note.description.substring(0, 100)}...` 
+                            : note.description
+                          }
+                        </p>
+                        <div className="note-meta">
+                          <span className="note-category">
+                            <FolderOpen className="meta-icon" />
+                            {note.category.name}
+                          </span>
+                          
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="note-actions">
-                    <motion.button
-                      className="action-btn info-btn"
-                      onClick={() => handleViewInfo(note)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                      title="Ver detalles"
-                    >
-                      <Eye />
-                    </motion.button>
-                    <motion.button
-                      className="action-btn edit-btn"
-                      onClick={() => handleEdit(note)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                      title="Editar nota"
-                    >
-                      <Edit3 />
-                    </motion.button>
-                    <motion.button
-                      className="action-btn delete-btn"
-                      onClick={() => handleDelete(note.id)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      transition={{ duration: 0.2 }}
-                      title="Eliminar nota"
-                    >
-                      <Trash2 />
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))}
-            </>
-          )}
-        </div>
+                    <div className="note-actions">
+                      <motion.button
+                        className="action-btn info-btn"
+                        onClick={() => handleViewInfo(note)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        title="Ver detalles"
+                      >
+                        <Eye />
+                      </motion.button>
+                      <motion.button
+                        className="action-btn edit-btn"
+                        onClick={() => handleEdit(note)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        title="Editar nota"
+                      >
+                        <Edit3 />
+                      </motion.button>
+                      <motion.button
+                        className="action-btn delete-btn"
+                        onClick={() => handleDelete(note.id)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        title="Eliminar nota"
+                      >
+                        <Trash2 />
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                ))}
+              </>
+            )}
+          </div>
 
-        {/* Paginación */}
-        {totalPages > 1 && (
-          <motion.div 
-            className="pagination-container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <motion.button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
-              whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
-              transition={{ duration: 0.2 }}
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <motion.div 
+              className="pagination-container"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <ChevronLeft />
-            </motion.button>
-            
-            <div className="page-info">
-              <span className="page-text">
-                Página {currentPage} de {totalPages}
-              </span>
-              <span className="total-text">
-                {filteredNotes.length} nota{filteredNotes.length !== 1 ? 's' : ''}
-              </span>
-            </div>
-            
-            <motion.button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
-              whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronRight />
-            </motion.button>
-          </motion.div>
-        )}
-      </motion.div>
+              <motion.button
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                whileHover={{ scale: currentPage === 1 ? 1 : 1.05 }}
+                whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronLeft />
+              </motion.button>
+              
+              <div className="page-info">
+                <span className="page-text">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <span className="total-text">
+                  {filteredNotes.length} nota{filteredNotes.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              
+              <motion.button
+                className="pagination-btn"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                whileHover={{ scale: currentPage === totalPages ? 1 : 1.05 }}
+                whileTap={{ scale: currentPage === totalPages ? 1 : 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight />
+              </motion.button>
+            </motion.div>
+          )}
+        </motion.div>
+      )}
 
       {/* Modal para crear/editar nota */}
       <AnimatePresence>

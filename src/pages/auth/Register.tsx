@@ -87,6 +87,12 @@ const Register: React.FC = () => {
 
   return (
     <div className="register-container">
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner" />
+          <span className="loading-text">Creando cuenta...</span>
+        </div>
+      )}
       <div className="app-title">
         <h1>App de notas personales</h1>
       </div>

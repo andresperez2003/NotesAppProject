@@ -91,6 +91,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner" />
+          <span className="loading-text">Iniciando sesión...</span>
+        </div>
+      )}
       <div className="app-title">
         <h1>App de notas personales</h1>
       </div>
