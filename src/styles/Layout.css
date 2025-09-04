@@ -45,6 +45,7 @@
   
   .main-content {
     padding: 1rem; /* Espacio para el botón de menú móvil */
+    padding-top: 0.5rem;
   }
 }
 
