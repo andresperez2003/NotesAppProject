@@ -21,7 +21,6 @@ const Admin: React.FC = () => {
 
   const [filterName, setFilterName] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'user'>('all');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -120,17 +119,6 @@ const Admin: React.FC = () => {
                 <option value="user">Usuarios</option>
               </select>
             </div>
-            <div className="filter-container">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
-                className="filter-select"
-              >
-                <option value="all">Todos los estados</option>
-                <option value="active">Activos</option>
-                <option value="inactive">Inactivos</option>
-              </select>
-            </div>
           </div>
           {/* Leyenda de colores por rol */}
           <div className="legend">
@@ -177,7 +165,7 @@ const Admin: React.FC = () => {
                 <Users className="empty-icon" />
                 <h3 className="empty-title">No hay usuarios</h3>
                 <p className="empty-description">
-                  {filterName || filterRole !== 'all' || filterStatus !== 'all' 
+                  {filterName || filterRole !== 'all' 
                     ? 'No se encontraron usuarios con esos filtros' 
                     : 'No hay usuarios registrados en el sistema'
                   }
