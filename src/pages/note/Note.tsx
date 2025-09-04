@@ -57,8 +57,8 @@ const NoteComponent: React.FC = () => {
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [, setError] = useState('');
+  const [, setSuccess] = useState('');
   const [filterName, setFilterName] = useState('');
   const [filterCategory, setFilterCategory] = useState<number | ''>('');
   const [currentPage, setCurrentPage] = useState(1);
