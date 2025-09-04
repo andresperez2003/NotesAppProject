@@ -3,6 +3,8 @@ import { PATH_BACKEND } from "./paths";
 
 const apiBackend = PATH_BACKEND;
 
+
+
 export async function createNote(note: CreateNote):Promise<void>{
     const response = await fetch(`${apiBackend}/notes`, {
       method: 'POST',

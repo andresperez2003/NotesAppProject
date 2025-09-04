@@ -8,7 +8,7 @@ import {
   User as UserIcon, 
   Mail, 
   Shield, 
-  Calendar, 
+ 
   Lock, 
   Eye, 
   EyeOff, 
@@ -16,7 +16,7 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  Edit3
+
 } from 'lucide-react';
 import '../../styles/User.css';
 import type { EditUserFormData, PasswordFormData, UserRegistered } from '../../types/user';

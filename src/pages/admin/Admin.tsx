@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Users, 
   Search, 
-  User,
+
   Mail,
-  Calendar,
+
   Shield,
   ChevronLeft,
   ChevronRight,
-  Eye,
-  MoreHorizontal
+
 } from 'lucide-react';
 import '../../styles/Admin.css';
 import { getUsers } from '../../services/users';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { User } from '../types/user';
+import type { UserRegistered } from '../types/user';
 import type { AuthState } from '../types/auth';
 
 
@@ -18,7 +18,8 @@ export const useAuth = () => {
     };
   });
 
-  const login = (token: string, user: User) => {
+  const login = (token: string, user: UserRegistered) => {
+
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     setAuthState({

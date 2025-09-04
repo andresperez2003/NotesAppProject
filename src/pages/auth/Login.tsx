@@ -3,10 +3,11 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
-import { findUserByCredentials } from '../../config/users';
+
 import { useAuth } from '../../hooks/useAuth';
 import '../../styles/Login.css';
-import type { UserRegistered } from '../../types/user';
+
+import { loginUser } from '../../services/users';
 
 // Tipos TypeScript
 interface LoginFormData {
@@ -41,7 +42,8 @@ const loginSchema = yup.object({
 
 const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const apiBackend = import.meta.env.VITE_PATH_BACKEND;
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -54,48 +56,34 @@ const Login: React.FC = () => {
     resolver: yupResolver(loginSchema),
   });
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError('');
 
     
   try {
-
-      const response = await fetch(`${apiBackend}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (response.ok) {
-        const result: LoginResponse = await response.json();
-        console.log(result);
-        localStorage.setItem('token', result.token);
-        const user: UserRegistered = {
-          ...result.user,
-          role: result.user.role
-        };
+      const result: LoginResponse = await loginUser(data.email, data.password);
+      const user = {
+        ...result.user,
+        role: result.user.role
+      };
 
         login(result.token, user);
         
 
         // Redirigir según el rol del usuario
         if (result.user.role.name === 'admin') {
-            navigate('/admin');
+            navigate('/dashboard/admin');
         } else {
-          navigate('/dashboard');
+          navigate('/dashboard/notes');
         } 
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'Error al iniciar sesión');
-      }
+      
     } catch (err) {
-      setError('Error de conexión. Intente nuevamente.');
+      setError('Error: verifique sus credenciales');
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +91,10 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      <div className="app-title">
+        <h1>App de notas personales</h1>
+      </div>
+      
       <div className="login-card">
 
 
@@ -133,13 +125,33 @@ const Login: React.FC = () => {
             <label htmlFor="password" className="input-label">
               Contraseña
             </label>
-            <input
-              id="password"
-              type="password"
-              {...register('password')}
-              className={`login-input ${errors.password ? 'error' : ''}`}
-              placeholder="••••••••"
-            />
+            <div className="password-input-container">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                {...register('password')}
+                className={`login-input ${errors.password ? 'error' : ''}`}
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={togglePasswordVisibility}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            </div>
             {errors.password && (
               <span className="error-message">{errors.password.message}</span>
             )}

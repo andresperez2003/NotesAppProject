@@ -1,3 +1,4 @@
+import type { LoginResponse } from "../types/auth";
 import type { EditUserFormData, PasswordFormData, RegisterFormData, UserRegistered } from "../types/user";
 import { PATH_BACKEND } from "./paths";
 
@@ -64,5 +65,31 @@ export async function registerUser(user: RegisterFormData): Promise<void> {
     return response.json();
   } else {
     throw new Error('Error al registrar el usuario');
+  }
+}
+
+export async function loginUser(email: string, password: string): Promise<LoginResponse> {
+  const response = await fetch(`${apiBackend}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  if (response.ok) {
+    const result: LoginResponse = await response.json();
+    console.log(result);
+    localStorage.setItem('token', result.token);
+    const user: UserRegistered = {
+      ...result.user,
+      role: result.user.role
+    };
+    return result;
+  } else {
+    throw new Error('Error al iniciar sesión');
   }
 }

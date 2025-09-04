@@ -7,7 +7,7 @@ import {
   FolderOpen, 
   Plus, 
   Search, 
-  Filter,
+
   Edit3, 
   Trash2, 
   X, 
@@ -15,7 +15,7 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  MoreHorizontal
+
 } from 'lucide-react';
 import '../../styles/Category.css';
 import type { Category, CategoryFormData } from '../../types/category';

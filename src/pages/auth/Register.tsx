@@ -15,15 +15,6 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
-interface RegisterResponse {
-  message: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    role: 'admin' | 'user';
-  };
-}
 
 // Esquema de validación
 const registerSchema = yup.object({
@@ -48,6 +39,8 @@ const registerSchema = yup.object({
 
 const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const navigate = useNavigate();
@@ -61,7 +54,15 @@ const Register: React.FC = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  const watchedPassword = watch('password');
+
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -78,7 +79,7 @@ const Register: React.FC = () => {
       });
       navigate('/login');
     } catch (err) {
-      setError('Error de conexión. Intente nuevamente.');
+      setError('Error: verifique sus datos');
     } finally {
       setIsLoading(false);
     }
@@ -86,6 +87,10 @@ const Register: React.FC = () => {
 
   return (
     <div className="register-container">
+      <div className="app-title">
+        <h1>App de notas personales</h1>
+      </div>
+      
       <div className="register-card">
         <div className="register-header">
           <h1 className="register-title">Crear Cuenta</h1>
@@ -105,69 +110,113 @@ const Register: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="register-form">
-          <div className="input-group">
-            <label htmlFor="name" className="input-label">
-              Nombre Completo
-            </label>
-            <input
-              id="name"
-              type="text"
-              {...register('name')}
-              className={`register-input ${errors.name ? 'error' : ''}`}
-              placeholder="Tu nombre completo"
-              maxLength={80}
-            />
-                         {errors.name && (
-               <span className="error-message">{errors.name.message}</span>
-             )}
+          <div className="form-row">
+            <div className="input-group">
+              <label htmlFor="name" className="input-label">
+                Nombre Completo
+              </label>
+              <input
+                id="name"
+                type="text"
+                {...register('name')}
+                className={`register-input ${errors.name ? 'error' : ''}`}
+                placeholder="Tu nombre completo"
+                maxLength={80}
+              />
+              {errors.name && (
+                <span className="error-message">{errors.name.message}</span>
+              )}
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="email" className="input-label">
+                Correo Electrónico
+              </label>
+              <input
+                id="email"
+                type="email"
+                {...register('email')}
+                className={`register-input ${errors.email ? 'error' : ''}`}
+                placeholder="ejemplo@correo.com"
+              />
+              {errors.email && (
+                <span className="error-message">{errors.email.message}</span>
+              )}
+            </div>
           </div>
 
-          <div className="input-group">
-            <label htmlFor="email" className="input-label">
-              Correo Electrónico
-            </label>
-            <input
-              id="email"
-              type="email"
-              {...register('email')}
-              className={`register-input ${errors.email ? 'error' : ''}`}
-              placeholder="ejemplo@correo.com"
-            />
-            {errors.email && (
-              <span className="error-message">{errors.email.message}</span>
-            )}
-          </div>
+          <div className="form-row">
+            <div className="input-group">
+              <label htmlFor="password" className="input-label">
+                Contraseña
+              </label>
+              <div className="password-input-container">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  className={`register-input ${errors.password ? 'error' : ''}`}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <span className="error-message">{errors.password.message}</span>
+              )}
+            </div>
 
-          <div className="input-group">
-            <label htmlFor="password" className="input-label">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              {...register('password')}
-              className={`register-input ${errors.password ? 'error' : ''}`}
-              placeholder="••••••••"
-            />
-            {errors.password && (
-              <span className="error-message">{errors.password.message}</span>
-            )}
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="confirmPassword" className="input-label">
-              Confirmar Contraseña
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              {...register('confirmPassword')}
-              className={`register-input ${errors.confirmPassword ? 'error' : ''}`}
-              placeholder="••••••••"
-            />
-            {errors.confirmPassword && (
-              <span className="error-message">{errors.confirmPassword.message}</span>
-            )}
+            <div className="input-group">
+              <label htmlFor="confirmPassword" className="input-label">
+                Confirmar Contraseña
+              </label>
+              <div className="password-input-container">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  {...register('confirmPassword')}
+                  className={`register-input ${errors.confirmPassword ? 'error' : ''}`}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={toggleConfirmPasswordVisibility}
+                  aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showConfirmPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <span className="error-message">{errors.confirmPassword.message}</span>
+              )}
+            </div>
           </div>
 
           <button

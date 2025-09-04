@@ -14,7 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import '../styles/Sidebar.css';
 
 interface SidebarProps {
-  userRole: 'admin' | 'user';
+  userRole: string;
   userName: string;
 }
 

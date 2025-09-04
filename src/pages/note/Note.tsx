@@ -10,7 +10,7 @@ import {
   FileText, 
   Plus, 
   Search, 
-  Filter,
+
   Edit3, 
   Trash2, 
   Eye,
@@ -20,7 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FolderOpen,
-  Calendar
+
 } from 'lucide-react';
 import '../../styles/Note.css';
 import { createNote, deleteNote, getNotes, updateNote } from '../../services/note';

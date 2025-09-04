@@ -4,13 +4,12 @@ import Sidebar from './Sidebar';
 import '../styles/Layout.css';
 
 interface LayoutProps {
-  userRole: 'admin' | 'user';
+  userRole: string;
   userName: string;
-  userEmail: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ userRole, userName, userEmail }) => {
-  console.log('Layout renderizado con:', { userRole, userName, userEmail });
+const Layout: React.FC<LayoutProps> = ({ userRole, userName }) => {
+
   
   return (
     <div className="layout">

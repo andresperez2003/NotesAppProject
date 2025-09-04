@@ -11,23 +11,25 @@ import Category from "../pages/category/Category";
 
 const AppRouter = () => {
   const { isAuthenticated, user } = useAuth();
+  
+
 
   return (
     <Routes>
       {/* Rutas públicas */}
       <Route path="/" element={
         isAuthenticated && user ? 
-        (user.role === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
         <Login />
       } />
       <Route path="/login" element={
         isAuthenticated && user ? 
-        (user.role === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
         <Login />
       } />
       <Route path="/register" element={
         isAuthenticated && user ? 
-        (user.role === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
         <Register />
       } />
       
@@ -37,9 +39,8 @@ const AppRouter = () => {
         element={
           isAuthenticated && user ? (
             <Layout 
-              userRole={user.role}
+              userRole={user.role.name}
               userName={user.name}
-              userEmail={user.email}
             />
           ) : (
             <Navigate to="/login" />
@@ -53,12 +54,12 @@ const AppRouter = () => {
         
         {/* Rutas para administradores */}
         <Route path="admin" element={
-          user?.role === 'admin' ? <Admin /> : <Navigate to="/dashboard/notes" />
+          user?.role.name === 'admin' ? <Admin /> : <Navigate to="/dashboard/notes" />
         } />
         
         {/* Redirección por defecto según rol */}
         <Route index element={
-          user?.role === 'admin' ? 
+          user?.role.name === 'admin' ? 
           <Navigate to="admin" /> : 
           <Navigate to="notes" />
         } />
