@@ -86,19 +86,20 @@ const Register: React.FC = () => {
     setSuccess('');
 
     try {
-      await registerUser(data);
+      const message = await registerUser(data);
       // Detener el loading antes de mostrar el SweetAlert
       setIsLoading(false);
-      setSuccess('Cuenta creada. Revisa tu correo para activar tu cuenta.');
+      setSuccess(message || 'Cuenta creada. Revisa tu correo para activar tu cuenta.');
       await Swal.fire({
         title: 'Cuenta creada exitosamente',
-        text: 'Revisa tu correo y sigue el enlace para activar tu cuenta.',
+        text: message || 'Revisa tu correo y sigue el enlace para activar tu cuenta.',
         icon: 'success',
         confirmButtonText: 'Ir al login'
       });
       navigate('/login');
     } catch (err) {
-      setError('Error: verifique sus datos');
+      const msg = err instanceof Error ? err.message : 'Error: verifique sus datos';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }

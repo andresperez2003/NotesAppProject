@@ -82,8 +82,11 @@ const Login: React.FC = () => {
           navigate('/dashboard/notes');
         } 
       
-    } catch (err) {
-      setError('Error: verifique sus credenciales');
+    } catch (err: unknown) {
+      const msg = err instanceof Error && err.message
+        ? err.message
+        : 'Error: verifique sus credenciales';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }

@@ -53,7 +53,7 @@ export async function getCurrentUser(): Promise<UserRegistered> {
 }
 
 
-export async function registerUser(user: RegisterFormData): Promise<void> {
+export async function registerUser(user: RegisterFormData): Promise<string> {
   const response = await fetch(`${apiBackend}/auth/register`, {
     method: 'POST',
     headers: {
@@ -62,9 +62,19 @@ export async function registerUser(user: RegisterFormData): Promise<void> {
     body: JSON.stringify(user),
   });
   if (response.ok) {
-    return response.json();
+    try {
+      const data = await response.json();
+      return data?.message || 'Registro exitoso';
+    } catch (_) {
+      return 'Registro exitoso';
+    }
   } else {
-    throw new Error('Error al registrar el usuario');
+    try {
+      const data = await response.json();
+      throw new Error(data?.message || 'Error al registrar el usuario');
+    } catch (_) {
+      throw new Error('Error al registrar el usuario');
+    }
   }
 }
 
@@ -87,7 +97,34 @@ export async function loginUser(email: string, password: string): Promise<LoginR
 
     return result;
   } else {
-    throw new Error('Error al iniciar sesión');
+    // Intentar obtener el mensaje de error del backend de forma robusta
+    let message = 'Error al iniciar sesión';
+    try {
+      const contentType = response.headers.get('Content-Type') || '';
+      if (contentType.includes('application/json')) {
+        const data: any = await response.json();
+        const possibleMessage =
+          data?.message ??
+          data?.error ??
+          (Array.isArray(data?.errors) ? (data.errors[0]?.message || data.errors[0]) : null) ??
+          (data?.errors && typeof data.errors === 'object' ? Object.values(data.errors)[0] : null) ??
+          data?.detail ??
+          data?.title;
+        if (typeof possibleMessage === 'string') {
+          message = possibleMessage;
+        } else if (Array.isArray(possibleMessage)) {
+          message = String(possibleMessage[0] ?? message);
+        }
+      } else {
+        const text = await response.text();
+        if (text && text.trim().length > 0) {
+          message = text.trim();
+        }
+      }
+    } catch (_err) {
+      // Mantener mensaje por defecto si algo falla al parsear
+    }
+    throw new Error(message);
   }
 }
 
