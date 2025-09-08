@@ -90,3 +90,71 @@ export async function loginUser(email: string, password: string): Promise<LoginR
     throw new Error('Error al iniciar sesión');
   }
 }
+
+export async function activateAccount(email: string, code: string): Promise<string> {
+  const encodedEmail = encodeURIComponent(email);
+  const response = await fetch(`${apiBackend}/auth/activate-account?email=${encodedEmail}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code })
+  });
+
+  if (response.ok) {
+    try {
+      const data = await response.json();
+      return data?.message || 'User activated';
+    } catch (_) {
+      return 'User activated';
+    }
+  } else {
+    let message = 'Error al activar la cuenta';
+    try {
+      const data = await response.json();
+      message = data?.message || message;
+    } catch (_err) {
+      // ignore
+    }
+    throw new Error(message);
+  }
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const encodedEmail = encodeURIComponent(email);
+  const response = await fetch(`${apiBackend}/auth/reset-password?email=${encodedEmail}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Error al solicitar el cambio de contraseña');
+  }
+}
+
+export async function confirmPasswordReset(token: string, newPassword: string): Promise<string> {
+  const encodedToken = encodeURIComponent(token);
+  const response = await fetch(`${apiBackend}/auth/confirm-reset-password?token=${encodedToken}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newPassword: newPassword })
+  });
+  if (response.ok) {
+    try {
+      const data = await response.json();
+      return data?.message || 'Password successful updated';
+    } catch (_) {
+      return 'Password successful updated';
+    }
+  } else {
+    let message = 'Error al actualizar la contraseña';
+    try {
+      const data = await response.json();
+      message = data?.message || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+}

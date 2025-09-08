@@ -8,6 +8,9 @@ import Layout from "../components/Layout";
 import { useAuth } from "../hooks/useAuth";
 import Note from "../pages/note/Note";
 import Category from "../pages/category/Category";
+import ActivateAccount from "../pages/auth/ActivateAccount";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ChangePasswordToken from "../pages/auth/ChangePasswordToken";
 
 const AppRouter = () => {
   const { isAuthenticated, user } = useAuth();
@@ -31,6 +34,21 @@ const AppRouter = () => {
         isAuthenticated && user ? 
         (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) : 
         <Register />
+      } />
+      <Route path="/validation/email" element={
+        isAuthenticated && user ?
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) :
+        <ActivateAccount />
+      } />
+      <Route path="/forgot-password" element={
+        isAuthenticated && user ?
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) :
+        <ForgotPassword />
+      } />
+      <Route path="/changepassword/token" element={
+        isAuthenticated && user ?
+        (user.role.name === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/notes" />) :
+        <ChangePasswordToken />
       } />
       
       {/* Rutas protegidas con Layout */}

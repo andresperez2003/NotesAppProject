@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -29,7 +30,10 @@ const registerSchema = yup.object({
     .required('El correo electrónico es requerido'),
   password: yup
     .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'La contraseña no cumple los requisitos'
+    )
     .required('La contraseña es requerida'),
   confirmPassword: yup
     .string()
@@ -49,10 +53,22 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-
+    watch,
   } = useForm<RegisterFormData>({
     resolver: yupResolver(registerSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
+  const passwordValue = watch('password') || '';
+  const requirements = useMemo(() => {
+    return [
+      { key: 'lower', label: 'Minúsculas', test: /[a-z]/.test(passwordValue) },
+      { key: 'upper', label: 'Mayúsculas', test: /[A-Z]/.test(passwordValue) },
+      { key: 'digit', label: 'Números', test: /\d/.test(passwordValue) },
+      { key: 'special', label: 'Caracter especial (@$!%*?&)', test: /[@$!%*?&]/.test(passwordValue) },
+      { key: 'length', label: 'Al menos 8 caracteres', test: passwordValue.length >= 8 },
+    ];
+  }, [passwordValue]);
 
 
 
@@ -71,11 +87,14 @@ const Register: React.FC = () => {
 
     try {
       await registerUser(data);
-      setSuccess('Cuenta creada exitosamente. Redirigiendo al login...');
-      Swal.fire({
+      // Detener el loading antes de mostrar el SweetAlert
+      setIsLoading(false);
+      setSuccess('Cuenta creada. Revisa tu correo para activar tu cuenta.');
+      await Swal.fire({
         title: 'Cuenta creada exitosamente',
+        text: 'Revisa tu correo y sigue el enlace para activar tu cuenta.',
         icon: 'success',
-        timer: 2000
+        confirmButtonText: 'Ir al login'
       });
       navigate('/login');
     } catch (err) {
@@ -183,6 +202,14 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
+              <div style={{ marginTop: 8, display: 'grid', rowGap: 6 }}>
+                {requirements.map(req => (
+                  <div key={req.key} style={{ display: 'flex', alignItems: 'center', gap: 8, color: req.test ? 'green' : '#666' }}>
+                    {req.test ? <FiCheckCircle size={16} /> : <FiXCircle size={16} />}
+                    <span>{req.label}</span>
+                  </div>
+                ))}
+              </div>
               {errors.password && (
                 <span className="error-message">{errors.password.message}</span>
               )}
@@ -219,6 +246,12 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
+              {(() => {
+                const pwd = watch('password') || '';
+                const confirm = watch('confirmPassword') || '';
+                const show = pwd.length > 0 && confirm.length > 0 && pwd !== confirm;
+                return show ? (<span className="error-message">Las contraseñas no coinciden</span>) : null;
+              })()}
               {errors.confirmPassword && (
                 <span className="error-message">{errors.confirmPassword.message}</span>
               )}
