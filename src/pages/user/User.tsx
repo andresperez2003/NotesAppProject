@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -16,6 +16,7 @@ import {
   X,
 
 } from 'lucide-react';
+import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import '../../styles/User.css';
 import type { PasswordFormData, UserRegistered } from '../../types/user';
 import { changePassword, getCurrentUser } from '../../services/users';
@@ -25,11 +26,13 @@ import Swal from 'sweetalert2';
 const passwordSchema = yup.object({
   currentPassword: yup
     .string()
-    .min(6, 'La contraseña actual debe tener al menos 6 caracteres')
     .required('La contraseña actual es requerida'),
   newPassword: yup
     .string()
-    .min(6, 'La nueva contraseña debe tener al menos 6 caracteres')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      'La contraseña no cumple los requisitos'
+    )
     .required('La nueva contraseña es requerida'),
   confirmPassword: yup
     .string()
@@ -56,11 +59,22 @@ const User: React.FC = () => {
     handleSubmit: handleSubmitPassword,
     formState: { errors: passwordErrors },
     reset: resetPassword,
+    watch: watchPassword,
   } = useForm<PasswordFormData>({
     resolver: yupResolver(passwordSchema),
   });
 
-
+  const newPasswordValue = watchPassword('newPassword') || '';
+  const confirmPasswordValue = watchPassword('confirmPassword') || '';
+  const requirements = useMemo(() => {
+    return [
+      { key: 'lower', label: 'Minúsculas', test: /[a-z]/.test(newPasswordValue) },
+      { key: 'upper', label: 'Mayúsculas', test: /[A-Z]/.test(newPasswordValue) },
+      { key: 'digit', label: 'Números', test: /\d/.test(newPasswordValue) },
+      { key: 'special', label: 'Caracter especial (@$!%*?&)', test: /[@$!%*?&]/.test(newPasswordValue) },
+      { key: 'length', label: 'Al menos 8 caracteres', test: newPasswordValue.length >= 8 },
+    ];
+  }, [newPasswordValue]);
 
   // Obtener datos del usuario actual
   useEffect(() => {
@@ -382,6 +396,14 @@ const User: React.FC = () => {
                       {showNewPassword ? <EyeOff /> : <Eye />}
                     </motion.button>
                   </div>
+                  <div style={{ marginTop: 8, display: 'grid', rowGap: 6 }}>
+                    {requirements.map(req => (
+                      <div key={req.key} style={{ display: 'flex', alignItems: 'center', gap: 8, color: req.test ? 'green' : '#666' }}>
+                        {req.test ? <FiCheckCircle size={16} /> : <FiXCircle size={16} />}
+                        <span>{req.label}</span>
+                      </div>
+                    ))}
+                  </div>
                   {passwordErrors.newPassword && (
                     <motion.span 
                       className="error-message"
@@ -418,6 +440,9 @@ const User: React.FC = () => {
                       {showConfirmPassword ? <EyeOff /> : <Eye />}
                     </motion.button>
                   </div>
+                  {newPasswordValue.length > 0 && confirmPasswordValue.length > 0 && newPasswordValue !== confirmPasswordValue ? (
+                    <span className="error-message">Las contraseñas no coinciden</span>
+                  ) : null}
                   {passwordErrors.confirmPassword && (
                     <motion.span 
                       className="error-message"

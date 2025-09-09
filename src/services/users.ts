@@ -1,11 +1,12 @@
 import type { LoginResponse } from "../types/auth";
 import type { PasswordFormData, RegisterFormData, UserRegistered } from "../types/user";
 import { PATH_BACKEND } from "./paths";
+import { authFetch } from './http';
 
 const apiBackend = PATH_BACKEND;
 
 export async function getUsers(): Promise<UserRegistered[]> {
-  const response = await fetch(`${apiBackend}/users`, {
+  const response = await authFetch(`${apiBackend}/users`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -21,7 +22,7 @@ export async function getUsers(): Promise<UserRegistered[]> {
 }
 
 export async function changePassword(password: PasswordFormData):Promise<void>{
-  const response = await fetch(`${apiBackend}/auth/change-password`, {
+  const response = await authFetch(`${apiBackend}/auth/change-password`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +38,7 @@ export async function changePassword(password: PasswordFormData):Promise<void>{
 }
 
 export async function getCurrentUser(): Promise<UserRegistered> {
-  const response = await fetch(`${apiBackend}/users/me`, {
+  const response = await authFetch(`${apiBackend}/users/me`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -54,7 +55,7 @@ export async function getCurrentUser(): Promise<UserRegistered> {
 
 
 export async function registerUser(user: RegisterFormData): Promise<string> {
-  const response = await fetch(`${apiBackend}/auth/register`, {
+  const response = await authFetch(`${apiBackend}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export async function registerUser(user: RegisterFormData): Promise<string> {
 }
 
 export async function loginUser(email: string, password: string): Promise<LoginResponse> {
-  const response = await fetch(`${apiBackend}/auth/login`, {
+  const response = await authFetch(`${apiBackend}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -130,7 +131,7 @@ export async function loginUser(email: string, password: string): Promise<LoginR
 
 export async function activateAccount(email: string, code: string): Promise<string> {
   const encodedEmail = encodeURIComponent(email);
-  const response = await fetch(`${apiBackend}/auth/activate-account?email=${encodedEmail}`, {
+  const response = await authFetch(`${apiBackend}/auth/activate-account?email=${encodedEmail}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -159,7 +160,7 @@ export async function activateAccount(email: string, code: string): Promise<stri
 
 export async function requestPasswordReset(email: string): Promise<void> {
   const encodedEmail = encodeURIComponent(email);
-  const response = await fetch(`${apiBackend}/auth/reset-password?email=${encodedEmail}`, {
+  const response = await authFetch(`${apiBackend}/auth/reset-password?email=${encodedEmail}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -172,7 +173,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
 
 export async function confirmPasswordReset(token: string, newPassword: string): Promise<string> {
   const encodedToken = encodeURIComponent(token);
-  const response = await fetch(`${apiBackend}/auth/confirm-reset-password?token=${encodedToken}`, {
+  const response = await authFetch(`${apiBackend}/auth/confirm-reset-password?token=${encodedToken}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

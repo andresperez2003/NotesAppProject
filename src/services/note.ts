@@ -1,12 +1,13 @@
 import type { CreateNote, Note, NoteFormData } from "../types/note";
 import { PATH_BACKEND } from "./paths";
+import { authFetch } from './http';
 
 const apiBackend = PATH_BACKEND;
 
 
 
 export async function createNote(note: CreateNote):Promise<void>{
-    const response = await fetch(`${apiBackend}/notes`, {
+    const response = await authFetch(`${apiBackend}/notes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +24,7 @@ export async function createNote(note: CreateNote):Promise<void>{
   }
 
   export async function deleteNote(noteId: number):Promise<void>{
-    const response = await fetch(`${apiBackend}/notes/${noteId}`, {
+    const response = await authFetch(`${apiBackend}/notes/${noteId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ export async function createNote(note: CreateNote):Promise<void>{
   
 
   export async function getNotes(): Promise<Note[]> {
-    const response = await fetch(`${apiBackend}/notes`, {
+    const response = await authFetch(`${apiBackend}/notes`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export async function createNote(note: CreateNote):Promise<void>{
   }
 
   export async function updateNote(notedId: number, note:NoteFormData): Promise<void>{
-    const response = await fetch(`${apiBackend}/notes/${notedId}`, {
+    const response = await authFetch(`${apiBackend}/notes/${notedId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
