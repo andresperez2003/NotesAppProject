@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 import { useAuth } from '../../hooks/useAuth';
 import '../../styles/Login.css';
@@ -44,7 +45,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const [error, setError] = useState<string>('');
+  // Mensajes ahora con SweetAlert
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -62,8 +63,6 @@ const Login: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setError('');
-
     
   try {
       const result: LoginResponse = await loginUser(data.email, data.password);
@@ -86,7 +85,7 @@ const Login: React.FC = () => {
       const msg = err instanceof Error && err.message
         ? err.message
         : 'Error: verifique sus credenciales';
-      setError(msg);
+      await Swal.fire({ icon: 'error', title: 'No se pudo iniciar sesión', text: msg, confirmButtonText: 'Entendido' });
     } finally {
       setIsLoading(false);
     }
@@ -108,11 +107,7 @@ const Login: React.FC = () => {
 
 
         <form onSubmit={handleSubmit(onSubmit)} className="login-form">
-          {error && (
-            <div className="error-container">
-              <p className="error-text">{error}</p>
-            </div>
-          )}
+          {/* Errores ahora con SweetAlert */}
 
           <div className="input-group">
             <label htmlFor="email" className="input-label">

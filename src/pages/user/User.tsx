@@ -46,8 +46,7 @@ const User: React.FC = () => {
   const [user, setUser] = useState<UserRegistered | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  // Mensajes ahora con SweetAlert
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -85,7 +84,7 @@ const User: React.FC = () => {
         setUser(userData);
       } catch (error) {
         console.error('Error al obtener el perfil del usuario:', error);
-        setError('Error al cargar el perfil del usuario');
+        await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al cargar el perfil del usuario', confirmButtonText: 'Entendido' });
       } finally {
         setIsLoadingProfile(false);
       }
@@ -96,14 +95,12 @@ const User: React.FC = () => {
 
   const onSubmitPassword = async (data: PasswordFormData) => {
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    
 
     try {
       await changePassword(data);
       
-      setSuccess('Contraseña actualizada exitosamente');
-      Swal.fire({
+      await Swal.fire({
         title: 'Contraseña actualizada exitosamente',
         icon: 'success',
         timer: 2000
@@ -111,10 +108,8 @@ const User: React.FC = () => {
       resetPassword();
       setShowPasswordModal(false);
       
-      // Limpiar mensaje de éxito después de 3 segundos
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Error al actualizar la contraseña');
+      await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al actualizar la contraseña', confirmButtonText: 'Entendido' });
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +122,7 @@ const User: React.FC = () => {
   const handleClosePasswordModal = () => {
     setShowPasswordModal(false);
     resetPassword();
-    setError('');
+    
   };
 
 
@@ -201,33 +196,7 @@ const User: React.FC = () => {
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {error && (
-          <motion.div 
-            className="error-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AlertCircle className="error-icon" />
-            <p className="error-text">{error}</p>
-          </motion.div>
-        )}
-
-        {success && (
-          <motion.div 
-            className="success-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CheckCircle className="success-icon" />
-            <p className="success-text">{success}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Alertas inline reemplazadas por SweetAlert */}
 
       <motion.div 
         className="user-profile-card"

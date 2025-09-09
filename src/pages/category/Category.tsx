@@ -12,7 +12,6 @@ import {
   Trash2, 
   X, 
   CheckCircle,
-  AlertCircle,
   ChevronLeft,
   ChevronRight,
 
@@ -40,8 +39,7 @@ const CategoryComponent: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  // Mensajes ahora se manejan con SweetAlert
   const [filterName, setFilterName] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -62,9 +60,19 @@ const CategoryComponent: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoadingData(true);
-      const categoriesData = await getCategories();
-      setCategories(categoriesData);
-      setIsLoadingData(false);
+      try {
+        const categoriesData = await getCategories();
+        setCategories(categoriesData);
+      } catch (e) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron cargar las categorías',
+          confirmButtonText: 'Entendido',
+        });
+      } finally {
+        setIsLoadingData(false);
+      }
     };
     fetchData();
   }, []);
@@ -94,8 +102,6 @@ const CategoryComponent: React.FC = () => {
 
   const onSubmit = async (data: CategoryFormData) => {
     setIsLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       
@@ -103,20 +109,19 @@ const CategoryComponent: React.FC = () => {
       if (editingCategory) {
         await updateCategory(editingCategory.id, data);
         setCategories(await getCategories());
-        setSuccess('Categoría actualizada exitosamente');
+        await Swal.fire({ icon: 'success', title: 'Actualizado', text: 'Categoría actualizada exitosamente', confirmButtonText: 'OK' });
       } else {
         await createCategory(data);
         setCategories(await getCategories());
-        setSuccess('Categoría creada exitosamente');
+        await Swal.fire({ icon: 'success', title: 'Creado', text: 'Categoría creada exitosamente', confirmButtonText: 'OK' });
       }
 
       reset();
       setShowModal(false);
       setEditingCategory(null);
       
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError('Error al procesar la categoría');
+      await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la categoría', confirmButtonText: 'Entendido' });
     } finally {
       setIsLoading(false);
     }
@@ -141,17 +146,13 @@ const CategoryComponent: React.FC = () => {
     });
     if (result.isConfirmed) {
       setIsLoading(true);
-      setError('');
-      setSuccess('');
 
       try {
         await deleteCategory(categoryId);
         setCategories(await getCategories());
-        setSuccess('Categoría eliminada exitosamente');
-        
-        setTimeout(() => setSuccess(''), 3000);
+        await Swal.fire({ icon: 'success', title: 'Eliminado', text: 'Categoría eliminada exitosamente', confirmButtonText: 'OK' });
       } catch (err) {
-        setError('Error al eliminar la categoría');
+        await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al eliminar la categoría', confirmButtonText: 'Entendido' });
       } finally {
         setIsLoading(false);
       }
@@ -162,7 +163,6 @@ const CategoryComponent: React.FC = () => {
     setShowModal(false);
     setEditingCategory(null);
     reset();
-    setError('');
   };
 
   const handleCreateNew = () => {
@@ -189,33 +189,7 @@ const CategoryComponent: React.FC = () => {
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {error && (
-          <motion.div 
-            className="error-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <AlertCircle className="error-icon" />
-            <p className="error-text">{error}</p>
-          </motion.div>
-        )}
-
-        {success && (
-          <motion.div 
-            className="success-container"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CheckCircle className="success-icon" />
-            <p className="success-text">{success}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Alertas inline reemplazadas por SweetAlert */}
 
       {/* Loading inicial */}
       <AnimatePresence>

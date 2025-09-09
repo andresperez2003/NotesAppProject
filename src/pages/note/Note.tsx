@@ -65,8 +65,7 @@ const NoteComponent: React.FC = () => {
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [, setError] = useState('');
-  const [, setSuccess] = useState('');
+  // Mensajes ahora se muestran con SweetAlert
   const [filterName, setFilterName] = useState('');
   const [filterCategory, setFilterCategory] = useState<number | ''>('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,7 +105,7 @@ const NoteComponent: React.FC = () => {
         setNotes(notesData);
         setCategories(categoriesData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        await Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar las notas', confirmButtonText: 'Entendido' });
       } finally {
         setIsLoadingData(false);
       }
@@ -137,14 +136,12 @@ const NoteComponent: React.FC = () => {
 
   const onSubmit = async (data: NoteFormData) => {
     setIsLoading(true);
-    setError('');
-    setSuccess('');
     
     try {
       if (editingNote) {
         // Actualizar nota existente
         await updateNote(editingNote.id, data);
-        setSuccess('Nota actualizada exitosamente');
+        await Swal.fire({ icon: 'success', title: 'Actualizada', text: 'Nota actualizada exitosamente', confirmButtonText: 'OK' });
       } else {
         // Crear nueva nota
         const createNoteData: CreateNote = {
@@ -154,7 +151,7 @@ const NoteComponent: React.FC = () => {
         };
         
         await createNote(createNoteData);
-        setSuccess('Nota creada exitosamente');
+        await Swal.fire({ icon: 'success', title: 'Creada', text: 'Nota creada exitosamente', confirmButtonText: 'OK' });
       }
 
       // Recargar todas las notas desde el servidor
@@ -164,12 +161,8 @@ const NoteComponent: React.FC = () => {
       reset();
       setShowModal(false);
       setEditingNote(null);
-      
-      // Limpiar mensaje de éxito después de 3 segundos
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      console.error('Error al procesar la nota:', err);
-      setError('Error al procesar la nota');
+      await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al procesar la nota', confirmButtonText: 'Entendido' });
     } finally {
       setIsLoading(false);
     }
@@ -197,21 +190,17 @@ const NoteComponent: React.FC = () => {
 
     if (result.isConfirmed) {
       setIsLoading(true);
-      setError('');
-      setSuccess('');
-
+      
       try {
         await deleteNote(noteId);
-        setSuccess('Nota eliminada exitosamente');
+        await Swal.fire({ icon: 'success', title: 'Eliminada', text: 'Nota eliminada exitosamente', confirmButtonText: 'OK' });
         
         // Recargar todas las notas desde el servidor
         const updatedNotes = await getNotes();
         setNotes(updatedNotes);
         
-        // Limpiar mensaje de éxito después de 3 segundos
-        setTimeout(() => setSuccess(''), 3000);
       } catch (err) {
-        setError('Error al eliminar la nota');
+        await Swal.fire({ icon: 'error', title: 'Error', text: 'Error al eliminar la nota', confirmButtonText: 'Entendido' });
       } finally {
         setIsLoading(false);
       }
@@ -227,7 +216,7 @@ const NoteComponent: React.FC = () => {
     setShowModal(false);
     setEditingNote(null);
     reset();
-    setError('');
+    // limpiar
   };
 
   const handleCloseInfoModal = () => {
