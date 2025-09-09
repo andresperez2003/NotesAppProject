@@ -21,12 +21,12 @@ import {
   FolderOpen,
 
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+ 
 import '../../styles/Note.css';
 import { createNote, deleteNote, getNotes, updateNote } from '../../services/note';
-import type { CategoryNote } from '../../types/category';
+import type { CategoryNote, CategoryFormData } from '../../types/category';
 import type { CreateNote, Note, NoteFormData } from '../../types/note';
-import { getCategories } from '../../services/category';
+import { getCategories, createCategory } from '../../services/category';
 import Swal from 'sweetalert2';
 
 
@@ -49,6 +49,14 @@ const noteSchema = yup.object({
     .required('Debes seleccionar una categoría'),
 }).required();
 
+const categorySchema = yup.object({
+  name: yup
+    .string()
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .required('El nombre es requerido'),
+}).required();
+
 const NoteComponent: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
@@ -65,7 +73,8 @@ const NoteComponent: React.FC = () => {
   const itemsPerPage = 3;
   const [notes, setNotes] = useState<Note[]>([]);
   const [categories, setCategories] = useState<CategoryNote[]>([]);
-  const navigate = useNavigate();
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [isCategoryLoading, setIsCategoryLoading] = useState(false);
 
   const {
     register,
@@ -77,6 +86,14 @@ const NoteComponent: React.FC = () => {
     resolver: yupResolver(noteSchema),
   });
 
+  const {
+    register: registerCategory,
+    handleSubmit: handleSubmitCategory,
+    formState: { errors: errorsCategory },
+    reset: resetCategory,
+  } = useForm<CategoryFormData>({
+    resolver: yupResolver(categorySchema),
+  });
 
 
   useEffect(() => {
@@ -225,8 +242,34 @@ const NoteComponent: React.FC = () => {
   };
 
   const handleGoToCreateCategory = () => {
-    setShowModal(false);
-    navigate('/dashboard/categories', { state: { openCreate: true } });
+    setShowCategoryModal(true);
+  };
+
+  const handleCloseCategoryModal = () => {
+    setShowCategoryModal(false);
+    resetCategory();
+  };
+
+  const onSubmitCategory = async (data: CategoryFormData) => {
+    setIsCategoryLoading(true);
+    try {
+      await createCategory(data);
+      const updatedCategories = await getCategories();
+      setCategories(updatedCategories);
+
+      const created = updatedCategories.find(c => c.name.toLowerCase() === data.name.toLowerCase());
+      if (created) {
+        // Auto-seleccionar la nueva categoría en el formulario de nota
+        setValue('category_id', created.id);
+      }
+      setShowCategoryModal(false);
+      resetCategory();
+    } catch (e) {
+      // opcional: mostrar feedback
+      console.error('Error al crear la categoría', e);
+    } finally {
+      setIsCategoryLoading(false);
+    }
   };
 
   return (
@@ -631,6 +674,104 @@ const NoteComponent: React.FC = () => {
                   <motion.button
                     type="button"
                     onClick={handleCloseModal}
+                    className="cancel-btn"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Cancelar
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal para crear categoría en línea */}
+      <AnimatePresence>
+        {showCategoryModal && (
+          <motion.div 
+            className="modal-overlay" 
+            onClick={handleCloseCategoryModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="modal-content" 
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="modal-header">
+                <div className="modal-title-section">
+                  <FolderOpen className="modal-title-icon" />
+                  <h2 className="modal-title">Nueva Categoría</h2>
+                </div>
+                <motion.button 
+                  className="close-btn" 
+                  onClick={handleCloseCategoryModal}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X />
+                </motion.button>
+              </div>
+
+              <form onSubmit={handleSubmitCategory(onSubmitCategory)} className="modal-form">
+                <div className="input-group">
+                  <label htmlFor="inlineCategoryName" className="input-label">
+                    <FolderOpen className="input-icon" />
+                    Nombre de la Categoría
+                  </label>
+                  <input
+                    id="inlineCategoryName"
+                    type="text"
+                    {...registerCategory('name')}
+                    className={`modal-input ${errorsCategory?.name ? 'error' : ''}`}
+                    placeholder="Ingresa el nombre de la categoría"
+                    maxLength={50}
+                  />
+                  {errorsCategory?.name && (
+                    <motion.span 
+                      className="error-message"
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {errorsCategory.name.message}
+                    </motion.span>
+                  )}
+                </div>
+
+                <div className="modal-actions">
+                  <motion.button
+                    type="submit"
+                    disabled={isCategoryLoading}
+                    className="submit-btn"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {isCategoryLoading ? (
+                      <motion.div 
+                        className="loading-spinner-small"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      />
+                    ) : (
+                      <CheckCircle className="btn-icon" />
+                    )}
+                    {isCategoryLoading ? 'Creando...' : 'Crear'}
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={handleCloseCategoryModal}
                     className="cancel-btn"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
