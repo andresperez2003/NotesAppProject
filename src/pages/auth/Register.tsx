@@ -94,9 +94,9 @@ const Register: React.FC = () => {
         title: 'Cuenta creada exitosamente',
         text: message || 'Revisa tu correo y sigue el enlace para activar tu cuenta.',
         icon: 'success',
-        confirmButtonText: 'Ir al login'
+        confirmButtonText: 'Ingresar código'
       });
-      navigate('/login');
+      navigate(`/validation/email?=${encodeURIComponent(data.email)}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error: verifique sus datos';
       setError(msg);
