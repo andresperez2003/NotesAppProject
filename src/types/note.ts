@@ -16,5 +16,5 @@ export interface Note {
  export  interface NoteFormData {
     name: string;
     description: string;
-    category_id: number;
+    category: number;
   }

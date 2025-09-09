@@ -44,7 +44,7 @@ const noteSchema = yup.object({
     .min(10, 'La descripción debe tener al menos 10 caracteres')
     .max(500, 'La descripción no puede tener más de 500 caracteres')
     .required('La descripción es requerida'),
-  category_id: yup
+  category: yup
     .number()
     .required('Debes seleccionar una categoría'),
 }).required();
@@ -150,7 +150,7 @@ const NoteComponent: React.FC = () => {
         const createNoteData: CreateNote = {
           name: data.name,
           description: data.description,
-          category: data.category_id
+          category: data.category
         };
         
         await createNote(createNoteData);
@@ -179,7 +179,7 @@ const NoteComponent: React.FC = () => {
     setEditingNote(note);
     setValue('name', note.name);
     setValue('description', note.description);
-    setValue('category_id', note.category.id);
+    setValue('category', note.category.id);
     setShowModal(true);
   };
 
@@ -260,7 +260,7 @@ const NoteComponent: React.FC = () => {
       const created = updatedCategories.find(c => c.name.toLowerCase() === data.name.toLowerCase());
       if (created) {
         // Auto-seleccionar la nueva categoría en el formulario de nota
-        setValue('category_id', created.id);
+          setValue('category', created.id);
       }
       setShowCategoryModal(false);
       resetCategory();
@@ -618,8 +618,8 @@ const NoteComponent: React.FC = () => {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <select
                       id="noteCategory"
-                      {...register('category_id')}
-                      className={`modal-select ${errors.category_id ? 'error' : ''}`}
+                      {...register('category')}
+                      className={`modal-select ${errors.category ? 'error' : ''}`}
                     >
                       <option value="">Selecciona una categoría</option>
                       {categories.map(category => (
@@ -639,14 +639,14 @@ const NoteComponent: React.FC = () => {
                       <Plus className="btn-icon" />
                     </motion.button>
                   </div>
-                  {errors.category_id && (
+                  {errors.category && (
                     <motion.span 
                       className="error-message"
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {errors.category_id.message}
+                        {errors.category.message}
                     </motion.span>
                   )}
                 </div>
