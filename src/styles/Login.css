@@ -139,6 +139,20 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Código de activación: inputs cuadrados y responsivos */
+.activation-code-input {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+}
+
+@media (max-width: 480px) {
+  .activation-code-input {
+    width: 44px;
+    height: 44px;
+  }
+}
+
 .login-input:focus {
   border-color: #3B38A0;
   box-shadow: 0 0 0 3px rgba(59, 56, 160, 0.1);

@@ -147,8 +147,8 @@ const ActivateAccount: React.FC = () => {
                 onChange={(e) => handleChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
                 onPaste={handlePaste}
-                className={`login-input${digit ? '' : ''}`}
-                style={{ width: 50, textAlign: 'center', fontSize: 20 }}
+                className={`login-input activation-code-input${digit ? '' : ''}`}
+                style={{ textAlign: 'center', fontSize: 20 }}
                 placeholder="•"
                 aria-label={`Dígito ${idx + 1}`}
               />
